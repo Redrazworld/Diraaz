@@ -1,0 +1,23 @@
+
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond&display=swap');
+
+
+  .name{
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.7rem;
+    padding-right: 5rem;
+}
+
+.me-auto .navlink{
+  padding-left: 2rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  color: black;
+  padding-right:2rem !important;
+}
+
+
+.bg-body-tertiary{
+  padding:1rem 0;
+}
