@@ -168,8 +168,7 @@ router.post('/api/client/do/login', async (req, res) => {
       }
   
       const user = results[0];
-      // console.log(user)
-      return res.status(200).json({ user });
+      return res.status(200).json({ user,key:process.env.RAZORPAY_KEY_ID });
     });
   });
 

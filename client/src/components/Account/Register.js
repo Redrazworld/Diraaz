@@ -17,11 +17,11 @@ function Register() {
   });
   const [resendAttempts, setResendAttempts] = useState(0);
 
-  useEffect(()=>{
-    if(isLogged){
-    navigate("/")
+  useEffect(() => {
+    if (isLogged) {
+      navigate("/");
     }
-  },[])
+  }, []);
 
   function handleInput(e, index) {
     const { value } = e.target;
@@ -41,7 +41,7 @@ function Register() {
 
   const handleRegistration = async (e) => {
     e.preventDefault();
-    if (EnteredOtp.join("") === generatedOtp) {
+    if (Number(EnteredOtp.join("").trim()) === generatedOtp) {
       try {
         const response = await fetch("/api/create/user", {
           method: "POST",
@@ -72,16 +72,13 @@ function Register() {
   const handleResend = async () => {
     if (resendAttempts < 3) {
       try {
-        const response = await fetch(
-          "/api/verify/user/email",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(inputForm),
-          }
-        );
+        const response = await fetch("/api/verify/user/email", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(inputForm),
+        });
         const data = await response.json();
         if (response.status === 200) {
           toast.success(data.message);
@@ -103,16 +100,13 @@ function Register() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await fetch(
-        "/api/verify/user/email",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(inputForm),
-        }
-      );
+      const response = await fetch("/api/verify/user/email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(inputForm),
+      });
       const data = await response.json();
       if (response.status === 200) {
         toast.success(data.message);

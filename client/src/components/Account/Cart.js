@@ -7,7 +7,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 function Cart() {
-  const { CartProducts, setCartProducts, token, setOrders } =
+  const { CartProducts, setCartProducts, token, setOrders, RazorPayKey } =
     useContext(ClientContext);
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
@@ -111,45 +111,81 @@ function Cart() {
     const price = products.find((p) => p._id === productId)?.price || 0;
     total += price;
   }
-  const makeOrder = async () => {
-    // console.log(paid,paidStatus)
-    // return
-    if (name && email && city && postalCode && street && country && phone) {
-      try {
-        const response = await axios.post(
-          "/api/make/order",
-          {
-            name,
-            email,
-            city,
-            postalCode,
-            street,
-            country,
-            CartProducts,
-            phone,
-            APhone,
-            total,
+
+  const makeOrder = async (type) => {
+    if (!(name && email && city && postalCode && street && country && phone)) {
+      toast.error("Please fill all the fields.");
+      return;
+    }
+  
+    const orderEndpoint =
+      type 
+        ? "/api/make/order/by/online"
+        : "/api/make/order";
+  
+    try {
+      const response = await axios.post(
+        orderEndpoint,
+        {
+          name,
+          email,
+          city,
+          postalCode,
+          street,
+          country,
+          CartProducts,
+          phone,
+          APhone,
+          total,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + token,
           },
-          {
-            headers: {
-              Authorization: "Bearer " + token, // Set the Authorization header
-            },
-          }
-        );
-        if (response.status === 200) {
-          console.log(response);
+        }
+      );
+  
+      if (response.status === 200) {
+  
+        if (type ) {
+          VerifyPayment(response.data.razorpayOrder);
+        } else {
           toast.success(response.data.message);
           setOrders((prev) => [...prev, response.data.order._id]);
           setCartProducts([]);
           navigate("/account/orders");
         }
-      } catch (error) {
-        console.log(error);
-        toast.error(error.response.data.message);
       }
-    } else {
-      toast.error("Please fill all the fields.");
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message);
     }
+  };
+
+  const VerifyPayment = (data) => {
+    const option = {
+      key: RazorPayKey,
+      amount: data.amount,
+      currency: data.currency,
+      name: "Diraaz",
+      description: "",
+      image: "/logo192.png",
+      order_id: data.id,
+      callback_url: "/api/payment/verification",
+      prefill: {
+        name: name,
+        email: email,
+        contact: phone,
+      },
+      notes: {
+        address: street,
+      },
+      theme: {
+        color: "#121212",
+      },
+    };
+    const razor = new window.Razorpay(option);
+    razor.open();
   };
 
   const removeAllItems = async (id) => {
@@ -316,12 +352,16 @@ function Cart() {
                   <button
                     type="button"
                     className="btn btn-success w-100 my-1"
-                    onClick={makeOrder}
+                    onClick={() => makeOrder(false)}
                   >
                     Cash on Delivery
                   </button>
-                  <button className="btn btn-success w-100 my-1">
-                    Pay Online
+                  <button
+                    className="btn btn-success w-100 my-1"
+                    type="button"
+                    onClick={() => makeOrder(true)}
+                  >
+                    Make a Payment
                   </button>
                 </form>
               </div>

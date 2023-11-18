@@ -15,6 +15,9 @@ import ContactUs from "./ContactUs";
 import Opportunities from "./Opportunities";
 import ProfileEdit from "./Account/ProfileEdit";
 import Footer from "./Footer";
+import PaymentSuccess from "./Account/PaymentSuccess";
+import PaymentFailed from "./Account/PaymentFailed";
+import Blog from "./Blog";
 
 export {
   Navbarcomponent,
@@ -34,4 +37,7 @@ export {
   Opportunities,
   ProfileEdit,
   Footer,
+  PaymentSuccess,
+  PaymentFailed,
+  Blog,
 };
