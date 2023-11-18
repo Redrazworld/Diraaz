@@ -1,0 +1,24 @@
+.footer1 {
+  padding: 8px 12px;
+  border-radius: 50px;
+  position: fixed;
+  left: 50%; /* set left to 50% */
+  transform: translateX(-50%); /* move the element back by 50% of its own width */
+  bottom: 20px;
+  display: inline-flex;
+  font-weight: 600;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer {
+  padding: 8px 12px;
+  border-radius: 50px;
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display: inline-flex;
+  font-weight: 600;
+  align-items: center;
+  justify-content: center;
+}

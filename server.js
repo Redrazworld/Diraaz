@@ -1,47 +1,38 @@
-const dotenv = require("dotenv");
-dotenv.config();
-const express = require("express");
+const express = require('express');
+require('dotenv').config();
+const db = require('./db');
+const cors = require('cors');
+const path =require ("path")
+
 const app = express();
-const PORT = 5000;
+const port = process.env.PORT || 8000;
+app.use(express.json()); // JSON parsing middleware
+app.use(express.urlencoded({ extended: true })); // URL-encoded parsing middleware
 
-const http = require("http").createServer(app);
-
-const mongoose = require("mongoose");
-
-const cors = require("cors");
-const path = require("path");
-
-// Enable CORS
 app.use(cors());
 
-app.use(express.json());
+app.use(require('./routes/client'));
+app.use(require('./routes/cart'));
+// app.use(require('./routes/categories'));
+app.use(require('./routes/contact'));
+app.use(require('./routes/order'));
+app.use(require('./routes/product'));
+// app.use(require('./routes/properties'));
+// app.use(require('./routes/subscription'));
+// app.use(require('./routes/user'));
 
-// require("./models/paper");
-
-// require("./models/projectLanguage");
-
-
-// mongoose.connect(process.env.MONGO_URL);
-// mongoose.connection.on("connected", () => {
-//   console.log("Connected to mongo");
-// });
-// mongoose.connection.on("error", () => {
-//   console.log("Failed to connect to mongo");
-// });
-
-// Serve the frontend
-app.use(express.static(path.join(__dirname, "client/build")));
-app.get("*", (req, res) => {
+//serving the frontend
+app.use(express.static(path.join(__dirname,"./client/build")))
+app.get("*",(req,res)=>{
   res.sendFile(
-    path.join(__dirname, "client/build/index.html"),
-    function (err) {
-      if (err) {
-        res.status(500).send(err);
-      }
+    path.join(__dirname,"./client/build/index.html"),
+    function (err){
+      res.status(500).send(err)
     }
-  );
-});
+  )
+})
 
-http.listen(PORT, () => {
-  console.log("Server is listening on " + PORT);
+// Start the Express server
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });

@@ -1,0 +1,40 @@
+.contact {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.contact-request {
+  color: #530050;
+}
+
+.contact-input {
+  border: none;
+  border-bottom: 1px dotted #530050;
+  margin-bottom: 5px;
+  padding: 5px;
+}
+
+.contact-input:focus {
+  outline: none;
+}
+.contact-input::before,
+.contact-input::after {
+  box-sizing: none;
+}
+
+.contact-button {
+  border: none;
+  background-color: transparent;
+  color: #530050;
+  padding: 5px;
+}
+.contact-detail {
+  text-align: right;
+}
+
+.contact-detail .text-small {
+  font-size: 12px;
+}
