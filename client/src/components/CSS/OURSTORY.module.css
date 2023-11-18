@@ -1,0 +1,30 @@
+.box {
+    display: flex;
+    width: 100%;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.7);
+    color: #fff;
+    border-radius: 15px;
+    height: 130vh;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .box .curve {
+    flex: 1; /* Take up the remaining space */
+    height: 100%;
+    border-radius: 0% 0% 150% 0%;
+    margin: 0px 0px 20px 0px;
+    background-image: url(https://avatars.githubusercontent.com/u/93257774?v=4);
+    background-repeat: no-repeat;
+    background-size: cover;
+    shape-outside: polygon(0% 0%, 40% 100%, 0% 0%, 0% 100%);
+  }
+  
+  #container {
+    flex: 1; /* Take up the remaining space */
+    text-align: justify;
+    line-height: 20px;
+    padding-right: 20px;
+    margin-left: 20px;
+  }
+  

@@ -1,0 +1,13 @@
+.cart {
+  max-width: 900px;
+  width: 100%;
+}
+.quantity {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+.address-input{
+    width: 49%;
+
+}
