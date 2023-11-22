@@ -1,5 +1,6 @@
 import ArrowRight from "./ArrowRight"
 import Bag from "./Bag"
+import Bin from "./Bin"
 import Cart from "./Cart"
 import Edit from "./Edit"
 import Facebook from "./Facebook"
@@ -22,4 +23,5 @@ export {
     Facebook,
     LinkedIn,
     Twitter,
+    Bin,
 }

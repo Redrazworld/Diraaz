@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import "./Cart.css";
-import { Minus, Plus } from "../Svgs";
+import { Bin, Minus, Plus } from "../Svgs";
 import { ClientContext } from "../../ClientContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -117,12 +117,11 @@ function Cart() {
       toast.error("Please fill all the fields.");
       return;
     }
-  
-    const orderEndpoint =
-      type 
-        ? "/api/make/order/by/online"
-        : "/api/make/order";
-  
+
+    const orderEndpoint = type
+      ? "/api/make/order/by/online"
+      : "/api/make/order";
+
     try {
       const response = await axios.post(
         orderEndpoint,
@@ -144,10 +143,9 @@ function Cart() {
           },
         }
       );
-  
+
       if (response.status === 200) {
-  
-        if (type ) {
+        if (type) {
           VerifyPayment(response.data.razorpayOrder);
         } else {
           toast.success(response.data.message);
@@ -215,8 +213,10 @@ function Cart() {
     >
       <div className="cart">
         {CartProducts && CartProducts?.length > 0 ? (
-          <div className="row">
-            <div className="col-md-7 w-full ">
+          <div className="row justify-content-center">
+            <div
+              className={`col-md-6 w-full  ${isMobile ? "mobile-hide" : ""}`}
+            >
               <div className="card rounded-3 p-4">
                 <table className="table ">
                   <thead>
@@ -233,7 +233,7 @@ function Cart() {
                         <tr>
                           <td>
                             <img
-                              width="120px"
+                              width="80px"
                               src={JSON.parse(product.images)[0]}
                               alt="image"
                             />
@@ -265,11 +265,17 @@ function Cart() {
                             </div>
                           </td>
                           <td>
+                            {!!product.isDeleted && (
+                              <span className="cartWarning">
+                                Product is not avilable.
+                                <br />
+                              </span>
+                            )}
                             <button
-                              className="btn btn-danger"
+                              className="btn btn-white"
                               onClick={() => removeAllItems(product._id)}
                             >
-                              Remove
+                              <Bin height="20" width="20" stroke="red" />
                             </button>
                           </td>
                           <td>
@@ -288,12 +294,18 @@ function Cart() {
                     </tr>
                   </tbody>
                 </table>
-                <button className="btn btn-success my-1">
+                <button
+                  className="mobile-show btn btn-success my-1"
+                  disabled={isPaymentDisabled}
+                  onClick={() => {
+                    setIsMobile(true);
+                  }}
+                >
                   Continue to Payment
                 </button>
               </div>
             </div>
-            <div className="col-md-5 w-full">
+            <div className={`col-md-6 w-full ${isMobile ? "" : "mobile-hide"}`}>
               <div className="card p-4">
                 <h4>Order Information</h4>
                 <form>
@@ -349,9 +361,13 @@ function Cart() {
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
                   />
+                  {isPaymentDisabled && (
+                    <p className="cartWarning">Action Needed</p>
+                  )}
                   <button
                     type="button"
                     className="btn btn-success w-100 my-1"
+                    disabled={isPaymentDisabled}
                     onClick={() => makeOrder(false)}
                   >
                     Cash on Delivery
@@ -359,9 +375,19 @@ function Cart() {
                   <button
                     className="btn btn-success w-100 my-1"
                     type="button"
+                    disabled={isPaymentDisabled}
                     onClick={() => makeOrder(true)}
                   >
                     Make a Payment
+                  </button>
+                  <button
+                    className="mobile-show btn btn-success w-100 my-1"
+                    type="button"
+                    onClick={() => {
+                      setIsMobile(false);
+                    }}
+                  >
+                    Go To Cart
                   </button>
                 </form>
               </div>

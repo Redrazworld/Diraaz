@@ -3,7 +3,7 @@ import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Blog, Cart, ContactUs, Footer, Login, Main, Navbarcomponent, OpenOrder, Opportunities, Order, OurProduct, OurStory, PageNotFound, PaymentFailed, PaymentSuccess, ProductOpen, Profile, ProfileEdit, Register,
+import { Blog, Cart, ContactUs, ForgotPassword, Login, Main, Navbarcomponent, OpenOrder, Opportunities, Order, OurProduct, OurStory, PageNotFound, PaymentFailed, PaymentSuccess, ProductOpen, Profile, ProfileEdit, Register,
 } from "./components";
 import { ClientContext } from "./ClientContext";
 import axios from "axios";
@@ -64,6 +64,7 @@ function App() {
           <Route path="/" element={<Main />} />
           <Route exact path="/login" element={<Login />} />
           <Route exact path="/register" element={<Register />} />
+          <Route exact path="/frogot/password" element={<ForgotPassword />} />
           <Route exact path="/blog" element={<Blog />} />
           <Route exact path="/our-story" element={<OurStory />} />
           <Route exact path="/contact-us" element={<ContactUs />} />
@@ -81,7 +82,6 @@ function App() {
 
           <Route path="*" element={<PageNotFound />} />
         </Routes>
-        <Footer/>
       </BrowserRouter>
       <ToastContainer theme="dark"/>
     </ClientContext.Provider>

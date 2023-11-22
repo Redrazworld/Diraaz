@@ -347,8 +347,8 @@ router.post("/api/payment/verification", async (req, res) => {
     await db.query(updateRazorpayDetailsQuery, [razorpay_payment_id, razorpay_signature, status, paid, razorpay_order_id]);
     //client url needed as prefix
     const redirectUrl = isAuthentic
-      ? `http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`
-      : `http://localhost:3000/paymentfailed?reference=${razorpay_payment_id}`;
+      ? `/paymentsuccess?reference=${razorpay_payment_id}`
+      : `/paymentfailed?reference=${razorpay_payment_id}`;
 
     res.redirect(redirectUrl);
   } catch (error) {

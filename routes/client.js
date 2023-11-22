@@ -191,5 +191,113 @@ router.post('/api/client/do/login', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+router.post('/api/verify/user/email/otp', async (req, res) => {
+  const { email } = req.body;
+  const selectQuery = 'SELECT * FROM clients WHERE email = ?';
+  const updateQuery = 'UPDATE clients SET generatedOtp = ? WHERE email = ?';
 
+  db.query(selectQuery, [email], (error, results) => {
+    if (error) {
+      console.error('Error executing MySQL query: ' + error);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
+
+    if (results.length === 0) {
+      return res.status(400).json({ message: 'No user found with this email.' });
+    }
+
+    const user = results[0];
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    db.query(updateQuery, [otp, email], (updateError, updateResults) => {
+      if (updateError) {
+        console.error('Error updating generatedOtp: ' + updateError);
+        return res.status(500).json({ message: 'Failed to update OTP in the database.' });
+      }
+      const subject = 'Password Reset Request';
+      const message = `Dear ${user.name},
+
+We received a request to reset your password on our platform. To proceed with the password reset, please use the following One-Time Password (OTP):
+
+OTP: ${otp}
+
+Please enter this OTP in the designated field to reset your password. Note that the OTP is valid for a limited time and should be kept confidential. Do not share this OTP with anyone.
+
+If you did not initiate this password reset or have any concerns, please disregard this email.
+
+Thank you for your cooperation.
+
+Best regards,
+DIRAAZ`;
+
+      // Create a Nodemailer transporter
+      let transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+          user: process.env.EMAIL,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
+
+      // Set up email data
+      let mailOptions = {
+        from: `"DIRAAZ" <${process.env.EMAIL}>`,
+        to: email,
+        subject: subject,
+        text: message,
+      };
+
+      // Send the email
+      transporter.sendMail(mailOptions, (emailError, info) => {
+        if (emailError) {
+          console.log(emailError);
+          return res.status(500).json({ error: 'Failed to send email' });
+        }
+
+        console.log('Email sent: %s', info.messageId);
+        res.status(200).json({ message: 'Email sent successfully', otp: otp });
+      });
+    });
+  });
+});
+
+
+router.post('/api/to/update/password', (req, res) => {
+  const { email, password, generatedOtp } = req.body;
+  const selectOtpQuery = 'SELECT generatedOtp FROM clients WHERE email = ?';
+  const updatePasswordQuery = 'UPDATE clients SET password = ?, generatedOtp = null WHERE email = ?';
+
+  db.query(selectOtpQuery, [email], (selectError, selectResults) => {
+    if (selectError) {
+      console.error('Error selecting OTP:', selectError);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
+
+    const clientGeneratedOtp = selectResults.length > 0 ? selectResults[0].generatedOtp : null;
+
+    if (clientGeneratedOtp === null || Number(clientGeneratedOtp) !== Number(generatedOtp)) {
+      return res.status(400).json({ message: 'Invalid OTP' });
+    }
+
+    bcrypt.hash(password, 10, (hashError, hashedPassword) => {
+      if (hashError) {
+        console.error('Error hashing password:', hashError);
+        return res.status(500).json({ message: 'Internal Server Error' });
+      }
+
+      db.query(updatePasswordQuery, [hashedPassword, email], (updateError, updateResults) => {
+        if (updateError) {
+          console.error('Error updating password:', updateError);
+          return res.status(500).json({ message: 'Internal Server Error' });
+        }
+
+        // Check the affected rows to ensure the password update was successful
+        if (updateResults.affectedRows > 0) {
+          return res.status(200).json({ message: 'Password updated successfully' });
+        } else {
+          return res.status(500).json({ message: 'Failed to update password' });
+        }
+      });
+    });
+  });
+});
   module.exports = router;

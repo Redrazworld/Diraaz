@@ -1,4 +1,5 @@
 import "../assets/styles/Main.css";
+import Footer from "./Footer";
 function Main() {
   return (
     <div>
@@ -8,6 +9,7 @@ function Main() {
           Teas.
         </p>
       </div>
+      <Footer/>
     </div>
   );
 }

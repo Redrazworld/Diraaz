@@ -18,6 +18,7 @@ import Footer from "./Footer";
 import PaymentSuccess from "./Account/PaymentSuccess";
 import PaymentFailed from "./Account/PaymentFailed";
 import Blog from "./Blog";
+import ForgotPassword from "./Account/ForgotPassword";
 
 export {
   Navbarcomponent,
@@ -40,4 +41,5 @@ export {
   PaymentSuccess,
   PaymentFailed,
   Blog,
+  ForgotPassword ,
 };

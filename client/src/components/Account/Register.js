@@ -15,6 +15,19 @@ function Register() {
     email: "",
     password: "",
   });
+  const [passwordValidation, setPasswordValidation] = useState({
+    minLength: false,
+    upperCase: false,
+    specialCharacter: false,
+  });
+
+  const validatePassword = (password) => {
+    setPasswordValidation({
+      minLength: password.length >= 8,
+      upperCase: /[A-Z]/.test(password),
+      specialCharacter: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    });
+  };
   const [resendAttempts, setResendAttempts] = useState(0);
 
   useEffect(() => {
@@ -37,6 +50,10 @@ function Register() {
   const handleInputForm = (e) => {
     const { name, value } = e.target;
     setInputForm({ ...inputForm, [name]: value });
+
+    if (name === "password") {
+      validatePassword(value);
+    }
   };
 
   const handleRegistration = async (e) => {
@@ -124,7 +141,7 @@ function Register() {
 
   return (
     <div className="background-image">
-      <div className="container h-80-profile d-flex align-items-center justify-content-center text-white">
+      <div className="container d-flex align-items-center justify-content-center text-white">
         <div className="container col-xl-10 col-xxl-8 px-4 py-5">
           {!isGenerated ? (
             <div className="row align-items-center g-lg-5 py-5">
@@ -167,7 +184,17 @@ function Register() {
                     <input
                       type="password"
                       name="password"
-                      className="form-control"
+                      className={`form-control ${
+                        passwordValidation.minLength &&
+                        passwordValidation.upperCase &&
+                        passwordValidation.specialCharacter
+                          ? "is-valid"
+                          : passwordValidation.minLength ||
+                            passwordValidation.upperCase ||
+                            passwordValidation.specialCharacter
+                          ? "is-invalid"
+                          : ""
+                      }`}
                       id="floatingPassword"
                       placeholder="Password"
                       value={inputForm.password}
@@ -175,6 +202,37 @@ function Register() {
                     />
                     <label htmlFor="floatingPassword">Password</label>
                   </div>
+                  <ul className="">
+                    <li
+                      className={`login-password-msg ${
+                        !passwordValidation.minLength
+                          ? "text-danger"
+                          : "text-success"
+                      }`}
+                    >
+                      Password must be at least 8 characters.
+                    </li>
+
+                    <li
+                      className={`login-password-msg ${
+                        !passwordValidation.upperCase
+                          ? "text-danger"
+                          : "text-success"
+                      }`}
+                    >
+                      Password must contain an uppercase letter.
+                    </li>
+
+                    <li
+                      className={`login-password-msg ${
+                        !passwordValidation.specialCharacter
+                          ? "text-danger"
+                          : "text-success"
+                      }`}
+                    >
+                      Password must contain a special character.
+                    </li>
+                  </ul>
 
                   <button
                     className="w-100 btn btn-lg btn-success mb-2"
@@ -185,7 +243,7 @@ function Register() {
                     {isLoading ? "Please wait" : " Sign up"}
                   </button>
                   <hr className="my-3" />
-                  <small className="text-muted">
+                  <small className="text-muted login-password-msg">
                     By clicking Sign up, you agree to the terms of use.
                   </small>
                   <br />
@@ -204,8 +262,7 @@ function Register() {
                     <br /> to verify your account
                   </h6>
                   <div>
-                    <span>A code has been sent to</span>
-                    <small>*******9897</small>
+                    <span>A code has been sent.</span>
                   </div>
                   <div
                     id="otp"
