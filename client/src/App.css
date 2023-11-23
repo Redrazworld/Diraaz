@@ -179,3 +179,29 @@ p {
     flex: none;
   }
 }
+
+.login-password-msg{
+  font-size: 12px;
+  text-align: left;
+}
+
+/* cart  */
+.cartWarning {
+  font-size: 12px;
+  color: #a10e0e;
+}
+.mobile-hide {
+  display: block;
+}
+.mobile-show {
+  display: none;
+}
+
+@media (max-width: 992px) {
+  .mobile-hide {
+    display: none;
+  }
+  .mobile-show {
+    display: block;
+  }
+}

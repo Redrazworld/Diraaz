@@ -6,18 +6,18 @@ import { ClientContext } from "../../ClientContext";
 import { toast } from "react-toastify";
 
 function Login() {
-  const { isLogged, setIsLogged,setToken } = useContext(ClientContext);
+  const { isLogged, setIsLogged, setToken } = useContext(ClientContext);
   const [inputForm, setInputForm] = useState({
     email: "",
     password: "",
   });
   const navigate = useNavigate();
 
-  useEffect(()=>{
-    if(isLogged){
-    navigate("/")
+  useEffect(() => {
+    if (isLogged) {
+      navigate("/");
     }
-  },[])
+  }, []);
 
   const handleInputForm = (e) => {
     const { name, value } = e.target;
@@ -32,21 +32,18 @@ function Login() {
     }
 
     try {
-      const response = await fetch(
-        "/api/client/do/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(inputForm),
-        }
-      );
+      const response = await fetch("/api/client/do/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(inputForm),
+      });
       const data = await response.json();
       if (response.status === 200) {
         setIsLogged(true);
         sessionStorage.setItem("token", data.token);
-        setToken(data.token)
+        setToken(data.token);
         sessionStorage.setItem("user", JSON.stringify(data.details));
         toast.success(data.message);
         navigate("/");
@@ -105,7 +102,7 @@ function Login() {
                 >
                   Sign In
                 </button>
-                <Link>Forgot password?</Link>
+                <Link to="/frogot/password">Forgot password?</Link>
                 <hr class="my-4" />
                 <small>
                   New account? <Link to="/register">Register here.</Link>

@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import "./Cart.css";
-import { Minus, Plus } from "../Svgs";
+import { Bin, Minus, Plus } from "../Svgs";
 import { ClientContext } from "../../ClientContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 function Cart() {
-  const { CartProducts, setCartProducts, token, setOrders } =
+  const { CartProducts, setCartProducts, token, setOrders, RazorPayKey } =
     useContext(ClientContext);
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
@@ -111,45 +111,79 @@ function Cart() {
     const price = products.find((p) => p._id === productId)?.price || 0;
     total += price;
   }
-  const makeOrder = async () => {
-    // console.log(paid,paidStatus)
-    // return
-    if (name && email && city && postalCode && street && country && phone) {
-      try {
-        const response = await axios.post(
-          "/api/make/order",
-          {
-            name,
-            email,
-            city,
-            postalCode,
-            street,
-            country,
-            CartProducts,
-            phone,
-            APhone,
-            total,
+
+  const makeOrder = async (type) => {
+    if (!(name && email && city && postalCode && street && country && phone)) {
+      toast.error("Please fill all the fields.");
+      return;
+    }
+
+    const orderEndpoint = type
+      ? "/api/make/order/by/online"
+      : "/api/make/order";
+
+    try {
+      const response = await axios.post(
+        orderEndpoint,
+        {
+          name,
+          email,
+          city,
+          postalCode,
+          street,
+          country,
+          CartProducts,
+          phone,
+          APhone,
+          total,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + token,
           },
-          {
-            headers: {
-              Authorization: "Bearer " + token, // Set the Authorization header
-            },
-          }
-        );
-        if (response.status === 200) {
-          console.log(response);
+        }
+      );
+
+      if (response.status === 200) {
+        if (type) {
+          VerifyPayment(response.data.razorpayOrder);
+        } else {
           toast.success(response.data.message);
           setOrders((prev) => [...prev, response.data.order._id]);
           setCartProducts([]);
           navigate("/account/orders");
         }
-      } catch (error) {
-        console.log(error);
-        toast.error(error.response.data.message);
       }
-    } else {
-      toast.error("Please fill all the fields.");
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message);
     }
+  };
+
+  const VerifyPayment = (data) => {
+    const option = {
+      key: RazorPayKey,
+      amount: data.amount,
+      currency: data.currency,
+      name: "Diraaz",
+      description: "",
+      image: "/logo192.png",
+      order_id: data.id,
+      callback_url: "/api/payment/verification",
+      prefill: {
+        name: name,
+        email: email,
+        contact: phone,
+      },
+      notes: {
+        address: street,
+      },
+      theme: {
+        color: "#121212",
+      },
+    };
+    const razor = new window.Razorpay(option);
+    razor.open();
   };
 
   const removeAllItems = async (id) => {
@@ -179,8 +213,10 @@ function Cart() {
     >
       <div className="cart">
         {CartProducts && CartProducts?.length > 0 ? (
-          <div className="row">
-            <div className="col-md-7 w-full ">
+          <div className="row justify-content-center">
+            <div
+              className={`col-md-6 w-full  ${isMobile ? "mobile-hide" : ""}`}
+            >
               <div className="card rounded-3 p-4">
                 <table className="table ">
                   <thead>
@@ -197,7 +233,7 @@ function Cart() {
                         <tr>
                           <td>
                             <img
-                              width="120px"
+                              width="80px"
                               src={JSON.parse(product.images)[0]}
                               alt="image"
                             />
@@ -229,11 +265,17 @@ function Cart() {
                             </div>
                           </td>
                           <td>
+                            {!!product.isDeleted && (
+                              <span className="cartWarning">
+                                Product is not avilable.
+                                <br />
+                              </span>
+                            )}
                             <button
-                              className="btn btn-danger"
+                              className="btn btn-white"
                               onClick={() => removeAllItems(product._id)}
                             >
-                              Remove
+                              <Bin height="20" width="20" stroke="red" />
                             </button>
                           </td>
                           <td>
@@ -252,12 +294,18 @@ function Cart() {
                     </tr>
                   </tbody>
                 </table>
-                <button className="btn btn-success my-1">
+                <button
+                  className="mobile-show btn btn-success my-1"
+                  disabled={isPaymentDisabled}
+                  onClick={() => {
+                    setIsMobile(true);
+                  }}
+                >
                   Continue to Payment
                 </button>
               </div>
             </div>
-            <div className="col-md-5 w-full">
+            <div className={`col-md-6 w-full ${isMobile ? "" : "mobile-hide"}`}>
               <div className="card p-4">
                 <h4>Order Information</h4>
                 <form>
@@ -313,15 +361,33 @@ function Cart() {
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
                   />
+                  {isPaymentDisabled && (
+                    <p className="cartWarning">Action Needed</p>
+                  )}
                   <button
                     type="button"
                     className="btn btn-success w-100 my-1"
-                    onClick={makeOrder}
+                    disabled={isPaymentDisabled}
+                    onClick={() => makeOrder(false)}
                   >
                     Cash on Delivery
                   </button>
-                  <button className="btn btn-success w-100 my-1">
-                    Pay Online
+                  <button
+                    className="btn btn-success w-100 my-1"
+                    type="button"
+                    disabled={isPaymentDisabled}
+                    onClick={() => makeOrder(true)}
+                  >
+                    Make a Payment
+                  </button>
+                  <button
+                    className="mobile-show btn btn-success w-100 my-1"
+                    type="button"
+                    onClick={() => {
+                      setIsMobile(false);
+                    }}
+                  >
+                    Go To Cart
                   </button>
                 </form>
               </div>

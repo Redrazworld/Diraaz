@@ -22,3 +22,39 @@
   align-items: center;
   justify-content: center;
 }
+/* Footer.css */
+
+/* Default font size */
+.footer1,
+.footer {
+  font-size: 6px;
+}
+
+/* Media queries for different device widths */
+@media only screen and (min-width: 600px) {
+  .footer1,
+  .footer {
+    font-size: 8px;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .footer1,
+  .footer {
+    font-size: 10px;
+  }
+}
+
+@media only screen and (min-width: 992px) {
+  .footer1,
+  .footer {
+    font-size: 12px;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .footer1,
+  .footer {
+    font-size: 14px;
+  }
+}
